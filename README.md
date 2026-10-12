@@ -8,7 +8,8 @@ validated locally and enforced by a CI gate.
 The plugin is two skills. `/disensor:setup` gets the CLI installed and the
 repository scaffolded. `/disensor:round` runs the round against a reviewer
 from another model family, has Claude verify every finding against the code,
-and fills the declaration that goes into the pull request.
+and fills the declaration that goes into the pull request. Only you can start
+a round: the skill is marked so that Claude does not load it on its own.
 
 ## Install
 
@@ -47,9 +48,13 @@ anywhere.
   reviewer's own CLI sends the material to its provider. It only does so after
   the repository owner ran `disensor reviewer consent` for that repository,
   that recipe and that executable; the skills never run that command for you.
-  A local reviewer, such as one running through Ollama, sends nothing.
+  A reviewer that runs on your machine sends nothing. The CLI treats `ollama`
+  as one and asks for no consent for it, but Ollama can also serve cloud
+  models (`:cloud`), so the setup skill says so if you pick one.
 - The declaration lands in `.residue/` of your repository, in its own commit,
-  and the gate validates it on the pull request.
+  and the gate validates it on the pull request. Making that check required
+  for merging is a branch protection setting on your side; disensor's README
+  lists it under deployment requirements.
 
 The runbook in `skills/round/SKILL.md` and the filling guide in
 `skills/round/references/guide.md` are generated from the pinned CLI
@@ -79,9 +84,10 @@ claude plugin validate --strict .
 claude --plugin-dir .        # try it in a session
 ```
 
-To move to a new disensor release: change `PIN` in `tools/generar.py` and
-`metadata.disensor` in `.claude-plugin/plugin.json`, install that version,
-regenerate, and raise the plugin `version`.
+To move to a new disensor release: change `PIN` in `tools/generar.py`,
+install that version and regenerate. The tests name every other place that
+carries the version (`plugin.json`, the CI workflow, this README) until they
+all agree. Then raise the plugin `version`.
 
 ## Support and license
 
