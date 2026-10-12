@@ -25,17 +25,23 @@ Run `disensor --version`.
   version or another package.
 - After installing, run `disensor --version` again. If the shell still
   resolves another copy, an older `disensor` comes first on PATH: show where
-  each one is (`which -a disensor`, or `where disensor` on Windows) and stop
-  until the user sorts it out. Every later command uses whatever the shell
-  resolves, so this check is the one that matters.
+  each one is (`which -a disensor`; on Windows `where.exe disensor`, or
+  `Get-Command disensor -All` in PowerShell, where `where` alone is an alias
+  of `Where-Object`) and stop until the user sorts it out. Every later
+  command uses whatever the shell resolves, so this check is the one that
+  matters.
 
-If `pipx` is missing, say so and propose, from the user's home directory and
-not from the repository, `python -I -m pip install --user pipx` and then
-`python -m pipx ensurepath`. `python -m` looks in the current directory
+The CLI needs Python 3.10 or newer and `pipx`. If `pipx` is missing, say so
+and propose the install pipx documents for the platform, run from the user's
+home directory and not from the repository: `brew install pipx` on macOS,
+`py -m pip install --user pipx` on Windows, the distribution package or
+`python3 -m pip install --user pipx` on Linux; then `pipx ensurepath`. The
+home directory matters because `python -m` looks in the current directory
 first, so a repository can carry a `pip.py` or `pipx.py` that would run
-instead; the home directory and `-I` avoid that. `ensurepath` changes PATH
-for new shells only: after it, the user restarts Claude Code before step 2.
-Do not improvise another way to install.
+instead. `ensurepath` changes PATH for new shells only: the user opens a new
+terminal, starts Claude Code there, and comes back to step 1 so the CLI gets
+installed and checked. If the machine has no Python 3.10 or newer, stop and
+say what is missing; do not install Python.
 
 ## 2. Scaffold the repository
 
@@ -52,9 +58,11 @@ from an earlier `disensor init`, say so: that section may tell Claude to run
 rounds on its own, which this plugin does not do, and that skill duplicates
 this runbook. Let the user decide whether to remove them; do not remove them
 yourself. If `.github/workflows/disensor.yml` already exists, run
-`disensor init --upgrade --no-claude` so the gate is pinned to 0.12.1; if the
-report says a tag could not be resolved, run `disensor pin` when there is
-network.
+`disensor init --upgrade --no-claude` to bring the gate to 0.12.1. Then read
+the `uses:` line of that workflow: it has to end in a 40-character commit
+SHA, because a tag can be moved. If it still says `@v0.12.1`, run
+`disensor pin` when there is network; `--upgrade` reports `current` for a
+tag of the right version and does not resolve it.
 
 To try disensor without touching CI, `disensor init --no-claude --no-workflow`
 does the same without the workflow. The workflow runs the gate on every pull
@@ -81,10 +89,13 @@ material under review. Do not run a candidate to inspect it, not even with
 owner approve it; never pass `--yes` for them.
 
 The catalogue marks `ollama` as a reviewer that keeps everything on the
-machine, and the CLI asks for no consent for it. Ollama can also serve cloud
-models (names ending in `:cloud`), whose prompts go to Ollama's servers: if the
-user picks one of those, say that the material leaves the machine anyway and
-let them choose.
+machine, and the CLI asks for no consent for it. That is true only when the
+Ollama server runs on this machine and the model is a downloaded one: Ollama
+also serves cloud models (names ending in `:cloud`), whose prompts go to
+Ollama's servers, and `OLLAMA_HOST` can point the client at a server
+elsewhere. Before registering `ollama`, check the model name and whether
+`OLLAMA_HOST` is set; if either sends the material out, say so and let the
+user choose.
 
 ## 4. Stop at the consent
 
