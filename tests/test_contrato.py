@@ -75,6 +75,9 @@ def test_the_plugin_is_skills_only():
     market = json.loads(read(".claude-plugin/marketplace.json"))
     for entry in market["plugins"]:
         assert not (set(entry) & set(COMPONENT_KEYS)), "component declared in the marketplace entry"
+    for name in ("setup", "round"):
+        frontmatter = skill(name).split("---")[1]
+        assert "hooks:" not in frontmatter, f"{name}: hooks in the skill frontmatter"
 
 
 def test_the_runbook_does_not_fetch_instructions_at_run_time():
