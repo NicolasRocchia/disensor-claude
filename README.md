@@ -45,12 +45,14 @@ anywhere.
   machine has.
 - `/disensor:round` runs `disensor round`, which packages the diff or the plan
   with the adversarial brief and hands it to the reviewer you registered. That
-  reviewer's own CLI sends the material to its provider. It only does so after
-  the repository owner ran `disensor reviewer consent` for that repository,
-  that recipe and that executable; the skills never run that command for you.
-  A reviewer that runs on your machine sends nothing. The CLI treats `ollama`
-  as one and asks for no consent for it, but Ollama can also serve cloud
-  models (`:cloud`), so the setup skill says so if you pick one.
+  reviewer's own CLI sends the material to its provider. For a reviewer the
+  CLI classifies as cloud, that happens only after the repository owner ran
+  `disensor reviewer consent` for that repository, that recipe and that
+  executable; the skills never run that command for you. A reviewer that runs
+  the model on your machine sends nothing. The CLI treats `ollama` as one and
+  asks for no consent for it, but Ollama can also serve cloud models
+  (`:cloud`) or talk to a server named by `OLLAMA_HOST`, so the setup skill
+  checks both before registering it.
 - The declaration lands in `.residue/` of your repository, in its own commit,
   and the gate validates it on the pull request. Making that check required
   for merging is a branch protection setting on your side; disensor's README
