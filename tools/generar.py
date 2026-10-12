@@ -42,14 +42,17 @@ Four rules that sit above the runbook below:
 
 - Start with `disensor --version`. This plugin was written for {pin}; if the
   shell resolves another version, say so and stop.
-- If the tree is not clean, say so and let the user commit. Do not commit,
-  stash or discard anything for them.
+- If the tree carries the user's uncommitted work, say so and let them
+  commit it; do not stash or discard anything. The one commit this runbook
+  makes is the declaration's, in step 5.
 - A candidate reviewer outside the catalogue is an executable that will later
   receive the material under review. Do not run it, not even with `--help`,
   before the owner approves registering it.
-- When more than one round ran, the declaration lists the findings of every
-  round, not only the last report. A clean last report does not erase what the
-  earlier ones found.
+- Give every round its own `--result` and `--report` paths and keep the
+  earlier ones: the runner overwrites a reused result file. When more than
+  one round ran, the declaration lists the findings and the reviewer of every
+  round, not only the last report. A clean last report does not erase what
+  the earlier ones found.
 
 """
 
@@ -62,6 +65,11 @@ ROUND_REWRITES = [
     (
         "`disensor guide` explains every field.",
         "The filling guide in `references/guide.md`, next to this file, explains every field.",
+    ),
+    (
+        "read its `--help`, and register it.",
+        "propose it, and register it once the OWNER approved it: do not run it, not even "
+        "with `--help`, before that.",
     ),
     (
         "pass `--gate plan --material <file>`:",
@@ -100,8 +108,14 @@ def installed_version() -> str:
 
 
 def rewrite(text: str, old: str, new: str) -> str:
-    """Replace `old` wherever the CLI wrapped it, exactly once."""
-    pattern = r"\s+".join(re.escape(word) for word in old.split())
+    """Replace `old` wherever the CLI wrapped it, exactly once.
+
+    Between two words the CLI may have put spaces or one line break, never a
+    blank line: a match must not cross paragraphs, and it must start and end
+    at a word boundary so a longer token does not satisfy it.
+    """
+    joiner = r"(?:[ \t]+|[ \t]*\n[ \t]*)"
+    pattern = r"(?<!\S)" + joiner.join(re.escape(word) for word in old.split()) + r"(?!\S)"
     text, n = re.subn(pattern, new, text)
     assert n == 1, f"rewrite target found {n} times: {old!r}"
     return text
@@ -130,6 +144,7 @@ def guide_reference(pin: str) -> str:
 
 def setup_skill(pin: str) -> str:
     template = (ROOT / "tools" / "plantillas" / "setup.md").read_bytes().decode("utf-8")
+    template = template.replace(CRLF, LF)
     assert template.count("{{PIN}}") >= 1
     return template.replace("{{PIN}}", pin)
 

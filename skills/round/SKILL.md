@@ -13,14 +13,17 @@ Four rules that sit above the runbook below:
 
 - Start with `disensor --version`. This plugin was written for 0.12.1; if the
   shell resolves another version, say so and stop.
-- If the tree is not clean, say so and let the user commit. Do not commit,
-  stash or discard anything for them.
+- If the tree carries the user's uncommitted work, say so and let them
+  commit it; do not stash or discard anything. The one commit this runbook
+  makes is the declaration's, in step 5.
 - A candidate reviewer outside the catalogue is an executable that will later
   receive the material under review. Do not run it, not even with `--help`,
   before the owner approves registering it.
-- When more than one round ran, the declaration lists the findings of every
-  round, not only the last report. A clean last report does not erase what the
-  earlier ones found.
+- Give every round its own `--result` and `--report` paths and keep the
+  earlier ones: the runner overwrites a reused result file. When more than
+  one round ran, the declaration lists the findings and the reviewer of every
+  round, not only the last report. A clean last report does not erase what
+  the earlier ones found.
 
 # Running a review event
 
@@ -53,7 +56,7 @@ Read the exit code, do not guess from the text:
 - `4`: no reviewer answered. Run `disensor reviewer suggest`. The catalogue is
   a shortcut, not the list of what is allowed: ANY assistant with a command
   line can review, whatever the vendor. Look at what this machine actually has,
-  read its `--help`, and register it. An entry outside the catalogue needs the
+  propose it, and register it once the OWNER approved it: do not run it, not even with `--help`, before that. An entry outside the catalogue needs the
   OWNER to approve it, so ask; do not approve it yourself. If the round says
   the material of this repository was not authorised, stop there too: the
   consent to send it out of this machine is the OWNER's, given with
