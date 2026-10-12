@@ -1,12 +1,26 @@
 ---
 name: round
-description: Run the adversarial review round with the disensor CLI and declare its residue. Use when the user asks to close a plan, a diff or an architecture decision with disensor, to run the round, or to fill the declaration it produced. Do not start a round the user did not ask for.
+description: Run the adversarial review round with the disensor CLI and declare its residue, when the user invokes it to close a plan, a diff or an architecture decision, or to fill the declaration a round produced.
+disable-model-invocation: true
 ---
 
-This skill drives the `disensor` CLI, which has to be installed and set up in
-the repository first (`/disensor:setup`). Run a round only when the user asked
-for it: the round sends the material under review to the reviewer the owner
-registered and consented to, and that is the owner's call every time.
+This skill drives the `disensor` CLI, installed and set up with
+`/disensor:setup`. It runs only when the user invokes it: the round sends the
+material under review to the reviewer the owner registered and consented to,
+and that is the owner's call every time.
+
+Four rules that sit above the runbook below:
+
+- Start with `disensor --version`. This plugin was written for 0.12.1; if the
+  shell resolves another version, say so and stop.
+- If the tree is not clean, say so and let the user commit. Do not commit,
+  stash or discard anything for them.
+- A candidate reviewer outside the catalogue is an executable that will later
+  receive the material under review. Do not run it, not even with `--help`,
+  before the owner approves registering it.
+- When more than one round ran, the declaration lists the findings of every
+  round, not only the last report. A clean last report does not erase what the
+  earlier ones found.
 
 # Running a review event
 
@@ -50,7 +64,7 @@ Read the exit code, do not guess from the text:
 - `6`: could not decide whether a round was needed. Stop and report. This is
   never a green light.
 
-For a plan or an architecture decision, pass `--gate plan --material <file>`:
+For a plan or an architecture decision, pass `--gate plan` or `--gate architecture` with `--material <file>`:
 that material does not live in the git range, and the scope cannot trigger it.
 Deciding that a plan crosses the impact bar is your judgement.
 
@@ -70,7 +84,7 @@ the stale result, which is the mechanism working, not an error to route around.
 ## 5. Declare
 
 ```
-disensor new --gate diff --level <A|B|C> --round <result>
+disensor new --gate <the gate of the round> --level <A|B|C> --round <result>
 ```
 
 It arrives prefilled with what the runner observed: reviewer, anchors, hashes,
@@ -80,8 +94,7 @@ whole cycle, not the reviewer: fill it only if you timed it. Fill in the finding
 their terminal states and the residue with what stayed open. The filling guide in `references/guide.md`, next to this file, explains every field. Do not invent findings or states: the artifact declares
 what happened, not what should have happened.
 
-Then `disensor validate` until it says VALID, and `disensor gate --no-comment`
-green. The declaration goes in its own commit, never mixed with code.
+Then `disensor validate` until it says VALID, and commit the declaration in its own commit, never mixed with code. Then `disensor gate --no-comment --base <target branch> --head HEAD` has to be green: the gate reads the declarations that are committed in that range.
 
 ## 6. The pull request
 
