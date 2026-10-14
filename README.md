@@ -42,7 +42,7 @@ anywhere.
   `disensor init --no-claude` at the repository root, which writes
   `disensor.config.json`, the CI gate workflow and a `.gitignore` line, and
   `disensor reviewer suggest`, which reports offline which reviewer CLIs the
-  machine has.
+  machine has, with the notes of each recipe it found.
 - `/disensor:round` runs `disensor round`, which packages the diff or the plan
   with the adversarial brief and hands it to the reviewer you registered. That
   reviewer's own CLI sends the material to its provider. For a reviewer the
