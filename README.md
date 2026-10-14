@@ -37,7 +37,7 @@ plugin itself bundles no executable, hook or server, and sends nothing
 anywhere.
 
 - `/disensor:setup` checks `disensor --version`. If the CLI is missing it
-  proposes `pipx install disensor==0.12.1`, the exact version this plugin was
+  proposes `pipx install disensor==0.13.0`, the exact version this plugin was
   written for, and runs it only after you approve. Then it runs
   `disensor init --no-claude` at the repository root, which writes
   `disensor.config.json`, the CI gate workflow and a `.gitignore` line, and
@@ -79,7 +79,7 @@ GitHub when you install or scaffold. The full statement is at
 ## Development
 
 ```
-pip install disensor==0.12.1 pytest
+pip install disensor==0.13.0 pytest
 python tools/generar.py      # regenerate the skills from the pinned CLI
 pytest -q                    # the contract: generated texts, pin, skills-only
 claude plugin validate --strict .

@@ -9,16 +9,13 @@ This skill drives the `disensor` CLI, installed and set up with
 material under review to the reviewer the owner registered and consented to,
 and that is the owner's call every time.
 
-Four rules that sit above the runbook below:
+Three rules that sit above the runbook below:
 
-- Start with `disensor --version`. This plugin was written for 0.12.1; if the
+- Start with `disensor --version`. This plugin was written for 0.13.0; if the
   shell resolves another version, say so and stop.
 - If the tree carries the user's uncommitted work, say so and let them
   commit it; do not stash or discard anything. The one commit this runbook
   makes is the declaration's, in step 5.
-- A candidate reviewer outside the catalogue is an executable that will later
-  receive the material under review. Do not run it, not even with `--help`,
-  before the owner approves registering it.
 - Give every round its own `--result` and `--report` paths and keep the
   earlier ones: the runner overwrites a reused result file. When more than
   one round ran, the declaration lists the findings and the reviewer of every
@@ -42,6 +39,15 @@ Commit your work first. The runner will not stash for you.
 
 ## 2. Run it
 
+Note the clock before you run it. `metrics.extra_time_sec` in the declaration
+is the stopwatch of the whole cycle from this point: the reviewer's runs, your
+verification of each finding, the rewriting and the refutations, up to the
+validated declaration. It excludes the implementation and the waits for the
+owner's answers. Count it from timestamps you actually have (this moment, the
+runner's `started_at` and `finished_at`, your commits); do not estimate it, and
+leave it out if you did not time it. An absent number is honest; a guessed one
+is not.
+
 ```
 disensor round --gate diff --generator-family <your family> \
   --base <target branch> --head HEAD \
@@ -55,11 +61,14 @@ Read the exit code, do not guess from the text:
   not demand one. Go to the pull request; the gate will agree.
 - `4`: no reviewer answered. Run `disensor reviewer suggest`. The catalogue is
   a shortcut, not the list of what is allowed: ANY assistant with a command
-  line can review, whatever the vendor. Look at what this machine actually has,
-  propose it, and register it once the OWNER approved it: do not run it, not even with `--help`, before that. An entry outside the catalogue needs the
-  OWNER to approve it, so ask; do not approve it yourself. If the round says
-  the material of this repository was not authorised, stop there too: the
-  consent to send it out of this machine is the OWNER's, given with
+  line can review, whatever the vendor. Look at what this machine actually has
+  without running it: reading a program's `--help` is already running it, and
+  a candidate runs only after the OWNER approved it. Its name and its path are
+  enough to propose it with `disensor reviewer add`, which prints the entry in
+  full and stops; an entry outside the catalogue needs the OWNER to approve it
+  with `--yes`, so ask; do not approve it yourself. If the round says the
+  material of this repository was not authorised, stop there too: the consent
+  to send it out of this machine is the OWNER's, given with
   `disensor reviewer consent <id>`. Never run that command yourself, not even
   after the owner approved the round in the chat: ask them to run it.
 - `5`: the tree changed during the round. Do NOT declare. Tell the user what
@@ -67,9 +76,10 @@ Read the exit code, do not guess from the text:
 - `6`: could not decide whether a round was needed. Stop and report. This is
   never a green light.
 
-For a plan or an architecture decision, pass `--gate plan` or `--gate architecture` with `--material <file>`:
-that material does not live in the git range, and the scope cannot trigger it.
-Deciding that a plan crosses the impact bar is your judgement.
+For a plan or an architecture decision, pass `--gate plan --material <file>` or
+`--gate architecture --material <file>`: that material does not live in the git
+range, and the scope cannot trigger it. Deciding that a plan crosses the impact
+bar is your judgement.
 
 ## 3. Read the report and verify
 
@@ -80,24 +90,35 @@ what is real, refute what is not, with evidence.
 ## 4. If you changed anything, run the round again
 
 The rule is the freshness of the material, not the verdict of the report. If
-you incorporated even a minor finding, HEAD moved and the previous round no
-longer covers what is going to be merged. `disensor new --round` will refuse
-the stale result, which is the mechanism working, not an error to route around.
+you incorporated even a minor finding, the material moved and the previous
+round no longer covers what is going to be merged. In a diff round HEAD moved,
+and `disensor new --round` will refuse the stale result, which is the mechanism
+working, not an error to route around. In a plan or an architecture round the
+document changes and HEAD does not, so the CLI cannot tell: there, repeating
+the round is on you.
 
 ## 5. Declare
 
 ```
-disensor new --gate <the gate of the round> --level <A|B|C> --round <result>
+disensor new --gate <plan|diff|architecture> --level <A|B|C> --round <result>
 ```
 
+The gate is the one the round ran: a result from a plan round declared as
+`diff` is refused, because the artifact identifies the review that happened.
 It arrives prefilled with what the runner observed: reviewer, anchors, hashes,
 the reviewer's wall time as `reviewer_seconds` in the extension space, and the
 residue items that a degraded round owes. `metrics.extra_time_sec` is the
-whole cycle, not the reviewer: fill it only if you timed it. Fill in the findings with
+whole cycle, not the reviewer: the stopwatch of step 2, counted from
+timestamps, or left out. Fill in the findings with
 their terminal states and the residue with what stayed open. The filling guide in `references/guide.md`, next to this file, explains every field. Do not invent findings or states: the artifact declares
 what happened, not what should have happened.
 
-Then `disensor validate` until it says VALID, and commit the declaration in its own commit, never mixed with code. Then `disensor gate --no-comment --base <target branch> --head HEAD` has to be green: the gate reads the declarations that are committed in that range.
+Then `disensor validate` until it says VALID. The declaration goes in its own
+commit, never mixed with code, and the gate reads it from that commit, not from
+the working tree: commit it first, then run
+`disensor gate --no-comment --base <target branch> --head HEAD` (outside
+GitHub Actions the range has to be given) and get it green before the pull
+request.
 
 ## 6. The pull request
 
@@ -114,4 +135,4 @@ arbiter reads.
   it, never you.
 - The tree changed during a round.
 
-<!-- disensor:block v0.11 -->
+<!-- disensor:block v0.13 -->
