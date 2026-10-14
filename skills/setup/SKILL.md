@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Set up disensor in the current repository with the disensor CLI pinned to 0.12.1. Use when the user asks to install, set up or configure disensor.
+description: Set up disensor in the current repository with the disensor CLI pinned to 0.13.0. Use when the user asks to install, set up or configure disensor.
 ---
 
 # Setting up disensor
@@ -14,10 +14,10 @@ the user agrees to that exact command.
 
 Run `disensor --version`.
 
-- It prints `disensor 0.12.1`: go to step 2.
-- It prints another version, or nothing: this plugin was written for 0.12.1.
-  Propose `pipx install --force disensor==0.12.1` (`pipx install
-  disensor==0.12.1` when it is not installed at all) and run it only after
+- It prints `disensor 0.13.0`: go to step 2.
+- It prints another version, or nothing: this plugin was written for 0.13.0.
+  Propose `pipx install --force disensor==0.13.0` (`pipx install
+  disensor==0.13.0` when it is not installed at all) and run it only after
   the user agrees. pipx installs from the index pip is configured to use,
   PyPI unless this machine overrides it: if `pip config list` or the
   environment (`PIP_INDEX_URL`, `PIP_EXTRA_INDEX_URL`) names another index,
@@ -58,11 +58,13 @@ from an earlier `disensor init`, say so: that section may tell Claude to run
 rounds on its own, which this plugin does not do, and that skill duplicates
 this runbook. Let the user decide whether to remove them; do not remove them
 yourself. If `.github/workflows/disensor.yml` already exists, run
-`disensor init --upgrade --no-claude` to bring the gate to 0.12.1. Then read
-the `uses:` line of that workflow: it has to end in a 40-character commit
-SHA, because a tag can be moved. If it still says `@v0.12.1`, run
-`disensor pin` when there is network; `--upgrade` reports `current` for a
-tag of the right version and does not resolve it.
+`disensor init --upgrade --no-claude` to bring the gate to 0.13.0. With
+network it resolves tag `v0.13.0` and pins the `uses:` line to that commit,
+also when the line was left on the tag; without network it leaves the
+workflow as it is and prints a WARNING that sends to `disensor pin`. Then
+read the `uses:` line of that workflow: it has to end in a 40-character
+commit SHA, because a tag can be moved. If it still says `@v0.13.0`, or
+`--upgrade` warned, run `disensor pin` when there is network.
 
 To try disensor without touching CI, `disensor init --no-claude --no-workflow`
 does the same without the workflow. The workflow runs the gate on every pull
@@ -73,15 +75,22 @@ requirements.
 ## 3. Find a reviewer
 
 Run `disensor reviewer suggest`. It is offline: it reports which catalogued
-reviewer CLIs this machine has. The reviewer has to come from a model family
-other than the one writing the code; that is the point of the round.
+reviewer CLIs this machine has, with the notes of each recipe it found: what
+the catalogue knows about how that reviewer is confined and what is still
+unverified. Relay those notes as printed. The reviewer has to come from a
+model family other than the one writing the code; that is the point of the
+round.
 
 Register one from the catalogue with `disensor reviewer add <id>`; `codex`
 and `ollama` need `--model <the model the account runs>`. For a reviewer that
 sends material out of the machine, `add` prints the entry and exits with 2
 asking for `--yes`: show the user what it printed, and either they re-run it
 with `--yes` or you add `--yes` only after they say so for that exact entry.
-Then `disensor reviewer list` shows what was registered.
+Then `disensor reviewer list` shows what was registered. A catalogue entry
+keeps the command of the day it was registered: when a later disensor changes
+that recipe, as the `claude` one did when it gained `--safe-mode`, the round
+leaves the entry out and says to remove it and add it again; `list` does not
+flag it. Propose that like any other `add`.
 
 An entry outside the catalogue is an executable that will later receive the
 material under review. Do not run a candidate to inspect it, not even with
