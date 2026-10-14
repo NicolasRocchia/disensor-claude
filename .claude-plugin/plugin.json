@@ -1,7 +1,7 @@
 {
   "name": "disensor",
   "displayName": "disensor",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Run a cross-model adversarial review round with the disensor CLI and declare its residue: what the review could not establish, validated and gated in CI.",
   "author": {
     "name": "Nicolas Rocchia",
