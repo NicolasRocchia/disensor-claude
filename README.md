@@ -16,15 +16,19 @@ a round: the skill is marked so that Claude does not load it on its own.
 In Claude Code, from any session:
 
 ```
-claude plugin install disensor --marketplace NicolasRocchia/disensor-claude
+claude plugin install disensor --marketplace https://github.com/NicolasRocchia/disensor-claude.git
 ```
 
 or, on versions before 2.1.292, in two steps:
 
 ```
-/plugin marketplace add NicolasRocchia/disensor-claude
+/plugin marketplace add https://github.com/NicolasRocchia/disensor-claude.git
 /plugin install disensor@disensor
 ```
+
+The HTTPS URL works without a GitHub SSH key. The shorter
+`NicolasRocchia/disensor-claude` form may clone over SSH and fail on a
+machine that has none, unless `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` is set.
 
 In claude.ai or the Claude desktop app, open **Customize > Plugins > Add >
 Add marketplace** and enter `NicolasRocchia/disensor-claude`. A plugin added
