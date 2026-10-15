@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Set up disensor in the current repository with the disensor CLI pinned to 0.13.0. Use when the user asks to install, set up or configure disensor.
+description: Set up disensor in the current repository with the disensor CLI pinned to 0.14.0. Use when the user asks to install, set up or configure disensor.
 ---
 
 # Setting up disensor
@@ -14,10 +14,10 @@ the user agrees to that exact command.
 
 Run `disensor --version`.
 
-- It prints `disensor 0.13.0`: go to step 2.
-- It prints another version, or nothing: this plugin was written for 0.13.0.
-  Propose `pipx install --force disensor==0.13.0` (`pipx install
-  disensor==0.13.0` when it is not installed at all) and run it only after
+- It prints `disensor 0.14.0`: go to step 2.
+- It prints another version, or nothing: this plugin was written for 0.14.0.
+  Propose `pipx install --force disensor==0.14.0` (`pipx install
+  disensor==0.14.0` when it is not installed at all) and run it only after
   the user agrees. pipx installs from the index pip is configured to use,
   PyPI unless this machine overrides it: if `pip config list` or the
   environment (`PIP_INDEX_URL`, `PIP_EXTRA_INDEX_URL`) names another index,
@@ -58,12 +58,12 @@ from an earlier `disensor init`, say so: that section may tell Claude to run
 rounds on its own, which this plugin does not do, and that skill duplicates
 this runbook. Let the user decide whether to remove them; do not remove them
 yourself. If `.github/workflows/disensor.yml` already exists, run
-`disensor init --upgrade --no-claude` to bring the gate to 0.13.0. With
-network it resolves tag `v0.13.0` and pins the `uses:` line to that commit,
+`disensor init --upgrade --no-claude` to bring the gate to 0.14.0. With
+network it resolves tag `v0.14.0` and pins the `uses:` line to that commit,
 also when the line was left on the tag; without network it leaves the
 workflow as it is and prints a WARNING that sends to `disensor pin`. Then
 read the `uses:` line of that workflow: it has to end in a 40-character
-commit SHA, because a tag can be moved. If it still says `@v0.13.0`, or
+commit SHA, because a tag can be moved. If it still says `@v0.14.0`, or
 `--upgrade` warned, run `disensor pin` when there is network.
 
 To try disensor without touching CI, `disensor init --no-claude --no-workflow`

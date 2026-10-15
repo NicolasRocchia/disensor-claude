@@ -11,7 +11,7 @@ and that is the owner's call every time.
 
 Three rules that sit above the runbook below:
 
-- Start with `disensor --version`. This plugin was written for 0.13.0; if the
+- Start with `disensor --version`. This plugin was written for 0.14.0; if the
   shell resolves another version, say so and stop.
 - If the tree carries the user's uncommitted work, say so and let them
   commit it; do not stash or discard anything. The one commit this runbook
