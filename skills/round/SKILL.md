@@ -9,7 +9,7 @@ This skill drives the `disensor` CLI, installed and set up with
 material under review to the reviewer the owner registered and consented to,
 and that is the owner's call every time.
 
-Three rules that sit above the runbook below:
+Four rules that sit above the runbook below:
 
 - Start with `disensor --version`. This plugin was written for 0.14.0; if the
   shell resolves another version, say so and stop.
@@ -21,6 +21,14 @@ Three rules that sit above the runbook below:
   one round ran, the declaration lists the findings and the reviewer of every
   round, not only the last report. A clean last report does not erase what
   the earlier ones found.
+- On exit code `4`, read what the round printed and the attempts in the
+  result before proposing anything. `not_authenticated` means the
+  reviewer's isolated home has no credentials: the owner signs it in from
+  their terminal with `disensor reviewer login <id>`, never you. An entry
+  the round calls stale, because its recipe changed since it was registered
+  (the `codex` one moved into an isolated home in 0.14.0), is removed and
+  added again as `/disensor:setup` describes, with the owner's `login` and
+  `consent` after it.
 
 # Running a review event
 
