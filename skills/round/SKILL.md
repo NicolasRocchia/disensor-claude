@@ -26,9 +26,13 @@ Four rules that sit above the runbook below:
   reviewer's isolated home has no credentials: the owner signs it in from
   their terminal with `disensor reviewer login <id>`, never you. An entry
   the round calls stale, because its recipe changed since it was registered
-  (the `codex` one moved into an isolated home in 0.14.0), is removed and
-  added again as `/disensor:setup` describes, with the owner's `login` and
-  `consent` after it.
+  (`codex` moved into an isolated home in 0.14.0; `claude` and `gemini` pass
+  `--model` since 0.15.0), is removed and added again as `/disensor:setup`
+  describes, with the owner's `consent` after it, and for `codex` the
+  owner's `login`. `inline_limit_unset` means the reviewer gets the material
+  inside its package and nobody said how much fits: the owner gives the
+  number, the entry is registered again with `--max-inline-bytes`, and you
+  never pick it.
 
 # Running a review event
 
