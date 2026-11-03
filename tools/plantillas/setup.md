@@ -66,15 +66,23 @@ read the `uses:` line of that workflow: it has to end in a 40-character
 commit SHA, because a tag can be moved. If it still says `@v{{PIN}}`, or
 `--upgrade` warned, run `disensor pin` when there is network.
 
-Two changes of 0.15.0 reach the rest of a CI that already ran the gate.
-`disensor gate` exits with 6 when it could not decide (no range, a commit it
-cannot find, a shallow clone without the merge base, a target policy it
-cannot read, or a crash) and keeps 1 for a red verdict; the workflow `init`
-writes fails the check on any exit other than 0. And the Action installs
-disensor in an environment of its own, outside the job's Python. If another
-step of the repository's CI compares the gate's exit code with 1, or calls
-`disensor` or imports `jsonschema` counting on the Action, say so: the first
-lets an undecided gate through, the second no longer finds them.
+Three changes of 0.15.0 reach a CI that already ran the gate:
+
+- `disensor gate` exits with 6 when it could not decide (no range, a commit
+  it cannot find, a shallow clone without the merge base, a target policy it
+  cannot read, or a crash) and keeps 1 for a red verdict. The workflow
+  that `init` writes fails the check on any exit other than 0; a step of the
+  repository's own that compares the exit code with 1 lets an undecided gate
+  through.
+- The Action installs disensor in an environment of its own, outside the
+  job's Python: a later step that calls `disensor` or imports `jsonschema`
+  counting on it no longer finds them.
+- The Action installs from wheels only, so CPython 3.13 free-threaded,
+  CPython 3.10 on Windows ARM and PyPy 3.10 cannot run it. The workflow
+  that `init` writes runs on `ubuntu-latest` with the Action's default Python;
+  in an existing one, read its `python-version` input and its runner.
+
+Say which of these the repository has.
 
 To try disensor without touching CI, `disensor init --no-claude --no-workflow`
 does the same without the workflow. The workflow runs the gate on every pull
@@ -116,11 +124,12 @@ say: ask them for the number, do not pick one.
 
 On Windows, check what `claude` or `gemini` resolves to before registering
 it (`Get-Command <id> -All` in PowerShell). The round never hands the
-package to a `.cmd` launcher, which is what npm installs, because `cmd.exe`
-cuts it at its first line break; and both get the package as an argument,
-so a diff of more than about 20 KB does not fit on the Windows command
-line. In both cases the round skips that reviewer: say so before
-registering it there.
+package to a `.cmd` or `.bat` launcher (npm installs a `.cmd`), because
+`cmd.exe` cuts it at its first line break. And both get the package as an
+argument: the whole command line, package and quoting included, holds at
+most 32,767 UTF-16 code units, which leaves room for a diff of about 20 KB.
+When the launcher is a script or the package does not fit, the round skips
+that reviewer before sending anything: say so before registering one there.
 
 The `codex` recipe runs from an isolated `CODEX_HOME`
 (`~/.disensor/reviewers/codex/home`, policy `codex_home/1`) with nothing of
