@@ -11,7 +11,7 @@ and that is the owner's call every time.
 
 Four rules that sit above the runbook below:
 
-- Start with `disensor --version`. This plugin was written for 0.14.0; if the
+- Start with `disensor --version`. This plugin was written for 0.15.0; if the
   shell resolves another version, say so and stop.
 - If the tree carries the user's uncommitted work, say so and let them
   commit it; do not stash or discard anything. The one commit this runbook
@@ -26,9 +26,13 @@ Four rules that sit above the runbook below:
   reviewer's isolated home has no credentials: the owner signs it in from
   their terminal with `disensor reviewer login <id>`, never you. An entry
   the round calls stale, because its recipe changed since it was registered
-  (the `codex` one moved into an isolated home in 0.14.0), is removed and
-  added again as `/disensor:setup` describes, with the owner's `login` and
-  `consent` after it.
+  (`codex` moved into an isolated home in 0.14.0; `claude` and `gemini` pass
+  `--model` since 0.15.0), is removed and added again as `/disensor:setup`
+  describes, with the owner's `consent` after it, and for `codex` the
+  owner's `login`. `inline_limit_unset` means the reviewer gets the material
+  inside its package and nobody said how much fits: the owner gives the
+  number, the entry is registered again with `--max-inline-bytes`, and you
+  never pick it.
 
 # Running a review event
 
@@ -58,9 +62,16 @@ is not.
 
 ```
 disensor round --gate diff --generator-family <your family> \
+  --generator-model <your exact model name> \
   --base <target branch> --head HEAD \
   --result <path outside the repository>
 ```
+
+`--generator-model` is your exact model name, the full one and not an alias.
+It is the only thing that tells your own model reviewing you
+(`same_model_fresh_context`) from another model of your family: without it, a
+reviewer of your family is recorded as your own model, the least independence
+the round can claim, and the round warns.
 
 Read the exit code, do not guess from the text:
 
@@ -134,6 +145,11 @@ Its body tells the whole event: what changed, which reviewer attacked it, every
 finding and what was done with it, and what stayed open. That is what the human
 arbiter reads.
 
+Every round prints how the consent it used was given: when, with which
+disensor, and whether standard input and output were a terminal. When it says
+without an interactive terminal, or that the provenance was not recorded, the
+body says so: the owner may not be the one who gave it.
+
 ## When to stop and ask
 
 - A risk that somebody has to accept (`owner_decision`).
@@ -143,4 +159,4 @@ arbiter reads.
   it, never you.
 - The tree changed during a round.
 
-<!-- disensor:block v0.13 -->
+<!-- disensor:block v0.15 -->
