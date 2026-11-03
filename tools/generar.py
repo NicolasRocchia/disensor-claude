@@ -19,7 +19,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-PIN = "0.14.0"
+PIN = "0.15.0"
 
 ROOT = Path(__file__).resolve().parent.parent
 RUNBOOK_HEADER = "# .claude/skills/disensor/SKILL.md"
